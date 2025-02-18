@@ -2,7 +2,7 @@ const express = require('express');
 const userService = require ('./userService');
 
 const app = express (); //nome qualquer para express
-app.use(express.json);// vou habilitar json express
+app.use(express.json());// vou habilitar json express
 
 // rota para criar usuário
 
