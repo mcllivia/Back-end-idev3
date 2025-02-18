@@ -19,7 +19,6 @@ alterarSenha(novaSenha){
 
 //exemplo de uso 
 
-
 // classe adimin que herda de usuário
 class admin extends usuário {
     constructor (nome, email, senha, nivelAcesso) {
