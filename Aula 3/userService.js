@@ -39,9 +39,9 @@ class userService {
         }
     }
 
-    addUser(nome, email) {
+    addUser(nome, email,senha,endereço,telefone,cpf) {
         try {
-            const user = new User(this.nextID++, nome, email)  //cria novo user, e o novoid++ é pra toda vez aumentar um no id
+            const user = new User(this.nextID++, nome, email, senha, endereço, telefone, cpf)  //cria novo user, e o novoid++ é pra toda vez aumentar um no id
             this.users.push(user) //da um push pra armazenar esse user no array de usuarios
             this.saveUsers();
             return user;

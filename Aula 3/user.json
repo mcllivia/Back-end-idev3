@@ -1,7 +1,1 @@
-[
-    {
-        "id": 1,
-        "nome": "João fulano",
-        "email": "joãofulano@gmail.com"
-    }
-]
+[{"id":1,"nome":"João fulano","email":"joãofulano@gmail.com","senha":"1245","endereço":"rua jose, 01","telefone":"(14) 99999999","cpf":"123456789"}]
