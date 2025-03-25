@@ -1,6 +1,7 @@
 const User = require("./user");
 const path = require('path');// modulo para manipular caminhos
 const fs = require('fs'); // modulo para manipular arquivos file system
+const bcrypt = require('bcryptjs'); //modulo para criptografar senha
 
 class userService {
     constructor() { //toda vez que váriavel comece com um valor fixo não precisa por aqui
@@ -39,9 +40,11 @@ class userService {
         }
     }
 
-    addUser(nome, email,senha,endereço,telefone,cpf) {
+    async addUser(nome, email,senha,endereço,telefone,cpf) {
         try {
-            const user = new User(this.nextID++, nome, email, senha, endereço, telefone, cpf)  //cria novo user, e o novoid++ é pra toda vez aumentar um no id
+            const senhaCripto = await bcrypt.hash(senha,10); //criptografa a senha
+
+            const user = new User(this.nextID++, nome, email, senhaCripto, endereço, telefone, cpf)  //cria novo user, e o novoid++ é pra toda vez aumentar um no id
             this.users.push(user) //da um push pra armazenar esse user no array de usuarios
             this.saveUsers();
             return user;

@@ -6,14 +6,14 @@ app.use(express.json());// vou habilitar json express
 
 // rota para criar usuário
 
-app.post("/users", (req, res) => {
+app.post("/users", async (req, res) => {
     const {nome,email,senha,endereço,telefone,cpf}= req.body;
     if (!nome|| !email|| !senha || !endereço || !telefone || !cpf){
         return res.status(400).json 
         ( {error:"Nome e o email são obrigatorios"})
     }
 
-    const user =userService.addUser(nome,email,senha,endereço,telefone,cpf);
+    const user = await userService.addUser(nome,email,senha,endereço,telefone,cpf);
     res.status(200).json({user});
 });
 
