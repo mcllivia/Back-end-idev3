@@ -7,14 +7,20 @@ app.use(express.json());// vou habilitar json express
 // rota para criar usuário
 
 app.post("/users", async (req, res) => {
+    try {
+    
     const {nome,email,senha,endereço,telefone,cpf}= req.body;
     if (!nome|| !email|| !senha || !endereço || !telefone || !cpf){
         return res.status(400).json 
-        ( {error:"Nome e o email são obrigatorios"})
+        ( {error:"Nome, email, endereço, senha, telefone e CPF são obrigatórios"})
     }
 
     const user = await userService.addUser(nome,email,senha,endereço,telefone,cpf);
     res.status(200).json({user});
+} catch (erro){
+    console.log("Erro ao criar usuario", erro);
+    res.status(400).json({error: erro.message});
+}
 });
 
 //rota para listar todos os usuários

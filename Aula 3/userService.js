@@ -41,15 +41,20 @@ class userService {
     }
 
     async addUser(nome, email,senha,endereço,telefone,cpf) {
+    
         try {
-            const senhaCripto = await bcrypt.hash(senha,10); //criptografa a senha
+            const cpfexistente = this.users.some(user => user.cpf === cpf);
+            if (cpfexistente) {throw new Error('CPF já cadastrado');}
 
+            const senhaCripto = await bcrypt.hash(senha,10); //criptografa a senha
+            
             const user = new User(this.nextID++, nome, email, senhaCripto, endereço, telefone, cpf)  //cria novo user, e o novoid++ é pra toda vez aumentar um no id
             this.users.push(user) //da um push pra armazenar esse user no array de usuarios
             this.saveUsers();
             return user;
         } catch (erro) {
             console.log('Erro ao adicionar usuario', erro);
+            throw erro;
         }
     }
 
@@ -61,10 +66,18 @@ class userService {
         }
     }
 
-    putUser(id, nome, email, senha, endereço, telefone, cpf) {
+   async putUser(id, nome, email, senha, endereço, telefone, cpf) {
         try {
+            
             const user = this.users.find(user => user.id === id);
-            if (!user) throw new Error('Usuário não encontrado');
+            if (!user) {throw new Error('Usuário não encontrado');}
+            
+            if (cpf !== user.cpf){
+                const cpfexistente = this.users.some(u => u.id !== id && u.cpf === cpf);
+                if (cpfexistente) {throw new Error('CPF já cadastrado');}
+              
+            }
+        const senhaCripto = await bcrypt.hash(senha,10);
             user.nome = nome;
             user.email = email;
             user.senha = senha;
@@ -75,6 +88,7 @@ class userService {
             return user;
         } catch (erro) {
             console.log('Erro ao alterar usuario', erro);
+            throw erro;
         }
     }
 
@@ -89,5 +103,6 @@ class userService {
     }
 
 }
+   
 
 module.exports = new userService     
