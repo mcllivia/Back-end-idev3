@@ -1,59 +1,51 @@
-const express = require('express');
-const userService = require ('./userService');
+const express = require('express')
+const userService = require('./userService')
 
-const app = express (); //nome qualquer para express
-app.use(express.json());// vou habilitar json express
+const app = express()
+app.use(express.json()) //ativa o json no express
 
-// rota para criar usuário
-
+//rota para usuario ser criado
 app.post("/users", async (req, res) => {
     try {
-    
-    const {nome,email,senha,endereço,telefone,cpf}= req.body;
-    if (!nome|| !email|| !senha || !endereço || !telefone || !cpf){
-        return res.status(400).json 
-        ( {error:"Nome, email, endereço, senha, telefone e CPF são obrigatórios"})
+        const { nome, email, senha, endereço, telefone, cpf } = req.body //passa um arquivo 
+        if (!nome || !email || !senha || !endereço || !telefone || !cpf) { //caso o nome e o email sejam diferentes vai dar erro
+            return res.status(400).json({ error: "Todos os campos são obrigatórios" }) //mensagem caso dê erro
+        }
+        const user = await userService.addUser(nome, email, senha, endereço, telefone, cpf)
+        res.status(200).json({ mensagem: "Usuário Cadastrado com Sucesso!" });
+    } catch (erro) {
+        res.status(401).json({ error: erro.message })
     }
-
-    const user = await userService.addUser(nome,email,senha,endereço,telefone,cpf);
-    res.status(200).json({user});
-} catch (erro){
-    console.log("Erro ao criar usuario", erro);
-    res.status(400).json({error: erro.message});
-}
 });
 
-//rota para listar todos os usuários
+//rota pra listar todos os usuarios
+app.get("/users", (req, res) => {
+    res.json(userService.getUsers())
+})
 
-app.get("/users", (req,res) => {
-    res.json(userService.getUsers());
-});
-
-//rota para excluir um usuario pelo id
-app.delete("/users/:id",(req,res) =>{
-    const id = parseInt (req.params.id); // converte o ID para número
+app.delete("/users/:id", (req, res) => {
+    const id = parseInt(req.params.id)
     try {
-        const resultado = userService.deleteUser(id); // tenta excluir o usuario
-        res.status(200).json(resultado); // retorna a mensagem de sucesso
-
-    } catch (erro){
-        res.status(404).json({ error: erro.message}); // retorna a mensaguem de erro
+        const resultado = userService.deleteUser(id)
+        res.status(200).json({ resultado })
+    } catch (erro) {
+        res.status(404).json({ error: erro.message })
     }
-});
+})
 
-//rota para alterar usuario 
-app.put("/users/:id", (req,res) => {
-    const id = parseInt(req.params.id);
-    const {nome,email,senha,endereço,telefone,cpf} = req.body;
+app.put("/users/:id", async (req, res) => {
     try {
-        const user = userService.putUser(id,nome,email,senha,endereço,telefone,cpf);
-        res.status(200).json(user);
-    } catch (erro){
-        res.status(404).json({error: erro.message});
+    const id = parseInt(req.params.id)
+    const { nome, email, senha, endereço, telefone, cpf } = req.body
+        const resultado = userService.putUser (id,nome, email, senha, endereço, telefone, cpf)
+        res.status(200).json({ mensagem: "Usuário editado com sucesso!" })
+    } catch (erro) {
+        console.error("Erro ao editar usuário:", erro);
+        res.status(500).json({ error: "Ja possui um usuario com este cpf" });
     }
-});
+})
 
-const port = 3000;
-app.listen(port,() => {
-    console.log("Servidor rodando na porta", port);
+const port = 3000
+app.listen(port, () => {
+    console.log("O servidor está rodando na porta: ", port)
 })
