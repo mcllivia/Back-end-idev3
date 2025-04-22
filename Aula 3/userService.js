@@ -4,44 +4,12 @@ const fs = require("fs");//modulo p manipular arquivos
 const { json } = require("express");
 const bcrypt = require("bcryptjs");
 const { error } = require("console");
-const mysql = require("./mysql")
+const mysql = require("./mysql");
+const { get } = require("http");
 
 class userService{
-    constructor(){ //quando não passa parâmetro traz um valor fixo, que não muda
-        this.filePath = path.join(__dirname, 'user.json');    
-        this.users = this.loadUsers(); // esse array é pra armazenar o user
-        this.nextID = this.getNextId(); //contador para gerar id
-    }
-
-    loadUsers(){
-        try{ // tenta executar o codigo
-        if (fs.existsSync(this.filePath)){ //verfica se o arquivo existe
-            const data = fs.readFileSync(this.filePath); //le o arqv
-            return JSON.parse(data); // transforma o json em objeto
-        }
-    }catch(erro){ //caso ocorra um erro
-        console.log("erro ao carregar arquivo", erro)
-    }
-        return[]; //quebra de codigos
-    }
-
-    getNextId(){
-        try{
-        if(this.users.length===-0) return 1; 
-        return Math.max(...this.users.map(user => user.id))+1;
-        }
-        catch (erro) {
-          console.log("erro ao buscar o id");
-        }
-    }
-
-saveUsers(){
-    try{
-    fs.writeFileSync(this.filePath, JSON.stringify(this.users));
-}catch(erro){
-    console.log('erro ao salvar arquivo');
-}
-}
+    
+   
 
     
     async addUser(nome,email,senha,endereço,telefone,cpf){
@@ -60,20 +28,34 @@ saveUsers(){
             throw erro;
         }
     }
-    getUsers(){
+   async getUsers(id){
         try{
-        return this.users;
+       const resultado = await mysql.execute(
+        `SELECT idusuario FROM usuario WHERE id = ?`,
+        	[id]	);
+            console.log("resultado", resultado);
+            return resultado;
         }catch(erro){
-            console.log("erro ao buscar usuário");
+            console.log("erro ao buscar usuário",erro);
         }
     }
-    deleteUser(id){
+    async deleteUser(id){
         try{
-            this.users = this.users.filter(user => user.id !== id);
-            this.saveUsers();
+
+            const users = await this.getUsers(id);
+            if(users.length === 0){
+                console.log("Usuário não existe!");
+                return;
+            }
+            const resultado = await mysql.execute(
+                `DELETE FROM usuario WHERE idusuario = ?`,
+                [id]
+            );
+            return resultado;
         }catch (erro){ 
+ 
             console.log("erro ao deletar usuário", erro);
-            console.log("erro ao deletar usuário");
+           
         }
     }
     async putUser(id, nome, email, senha, endereço, telefone, cpf) {

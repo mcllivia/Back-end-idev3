@@ -23,13 +23,16 @@ app.get("/users", (req, res) => {
     res.json(userService.getUsers())
 })
 
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", async (req, res) => {
     const id = parseInt(req.params.id)
     try {
-        const resultado = userService.deleteUser(id)
-        res.status(200).json({ resultado })
+        const resultado =  await userService.deleteUser(id)
+        if (!resultado) {
+            return res.status(406).json({ error: "Usuário não existe" })
+        }
+      return   res.status(200).json({ resultado })
     } catch (erro) {
-        res.status(404).json({ error: erro.message })
+    res.status(404).json({ error: erro.message });
     }
 })
 
